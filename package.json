@@ -1,0 +1,92 @@
+{
+    "name": "achievement-cmd",
+    "version": "0.0.1",
+    "description": "",
+    "author": "",
+    "license": "MIT",
+    "scripts": {
+        "build": "rimraf dist && tsc -p tsconfig.build.json",
+        "format": "prettier --write \"src/**/*.ts\"",
+        "start": "ts-node -r tsconfig-paths/register src/main.ts",
+        "start:dev": "tsc-watch -p tsconfig.build.json --onSuccess \"node dist/main.js\"",
+        "start:debug": "tsc-watch -p tsconfig.build.json --onSuccess \"node --inspect-brk dist/main.js\"",
+        "start:prod": "node dist/main.js",
+        "lint": "tslint -p tsconfig.json -c tslint.json",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:cov": "jest --coverage",
+        "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+        "test:e2e": "jest --config ./test/jest-e2e.json"
+    },
+    "dependencies": {
+        "@azure/storage-blob": "^12.5.0",
+        "@nestjs/common": "^7.6.15",
+        "@nestjs/config": "^0.6.3",
+        "@nestjs/core": "^7.6.15",
+        "@nestjs/cqrs": "^7.0.1",
+        "@nestjs/mongoose": "^7.2.4",
+        "@nestjs/platform-express": "^7.6.15",
+        "@nestjs/swagger": "^4.8.0",
+        "cache-manager": "^3.4.3",
+        "class-transformer": "^0.4.0",
+        "class-validator": "^0.13.1",
+        "dotenv": "^8.2.0",
+        "moment": "^2.29.1",
+        "mongoose": "^5.12.5",
+        "reflect-metadata": "^0.1.13",
+        "rimraf": "^3.0.2",
+        "rxjs": "^6.6.7",
+        "swagger-ui-express": "^4.1.6"
+    },
+    "devDependencies": {
+        "@nestjs/cli": "^7.6.0",
+        "@nestjs/schematics": "^7.3.1",
+        "@nestjs/testing": "^7.6.15",
+        "@types/cache-manager": "^3.4.0",
+        "@types/dotenv": "^8.2.0",
+        "@types/express": "^4.17.11",
+        "@types/jest": "^26.0.22",
+        "@types/mongoose": "^5.10.5",
+        "@types/node": "^14.14.41",
+        "@types/supertest": "^2.0.11",
+        "@typescript-eslint/eslint-plugin": "^4.22.0",
+        "@typescript-eslint/parser": "^4.22.0",
+        "chalk": "^4.1.1",
+        "eslint": "^7.24.0",
+        "eslint-config-google": "^0.14.0",
+        "eslint-config-standard": "^16.0.2",
+        "eslint-plugin-import": "^2.22.1",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-standard": "^5.0.0",
+        "jest": "^26.6.3",
+        "nodemon": "^2.0.7",
+        "prettier": "^2.2.1",
+        "supertest": "^6.1.3",
+        "ts-jest": "^26.5.5",
+        "ts-loader": "^9.1.0",
+        "ts-node": "^9.1.1",
+        "tsc-watch": "^4.2.9",
+        "tsconfig-paths": "^3.9.0",
+        "tslint": "^6.1.3",
+        "typescript": "^4.2.4"
+    },
+    "jest": {
+        "moduleFileExtensions": [
+            "js",
+            "json",
+            "ts"
+        ],
+        "moduleDirectories": [
+            "node_modules",
+            "src"
+        ],
+        "rootDir": "src",
+        "testRegex": ".spec.ts$",
+        "transform": {
+            "^.+\\.(t|j)s$": "ts-jest"
+        },
+        "coverageDirectory": "./coverage",
+        "testEnvironment": "node"
+    }
+}
