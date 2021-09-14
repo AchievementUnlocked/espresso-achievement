@@ -1,7 +1,7 @@
 // Base framework dependencies
-import { Controller, Post, Body, HttpCode, UsePipes, ValidationPipe, UseInterceptors, UseFilters, UploadedFiles } from '@nestjs/common';
+import { Controller, Post, Put, Param, Body, HttpCode, UsePipes, ValidationPipe, UseInterceptors, UseFilters, UploadedFiles } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ApiConsumes} from '@nestjs/swagger';
+import { ApiConsumes } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 
 // External and installed dependencies
@@ -12,7 +12,7 @@ import { AppExceptionFilter } from 'operational/exception';
 
 // Inner application dependencies
 import { Achievement } from 'domain/entities';
-import { CreateAchievementCommand, CreateAchievementMediaCommand } from 'domain/commands';
+import { CreateAchievementCommand, CreateAchievementMediaCommand, UpdateAchievementContentCommand } from 'domain/commands';
 import { HandlerResponse } from 'cmd/handlers/command-handlers';
 
 // Innermodule dependencies
@@ -48,6 +48,37 @@ export class AchievementCmdController extends CommonController {
         try {
             // Take each of the file metadat andd turn it into a command
             command.media = CreateAchievementMediaCommand.fromHttpFiles(files);
+
+            const response = await this.commandBus.execute(command) as HandlerResponse;
+
+            this.logPolicy.debug('RESPONSE');
+            const entity = response.data as Achievement;
+            this.logPolicy.debug(`${entity.key} : ${entity.title}`);
+
+            return response;
+        } catch (error) {
+            // TODO: Log command before handling the error and returning a response
+
+            this.handleError(error, ControlerErrors.CreateAchievementError);
+        }
+    }
+
+
+
+
+
+
+    @Put(':key/content')
+    @HttpCode(202)
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async updateAchievementContent(
+        @Param('key') key: string,
+        @Body() command: UpdateAchievementContentCommand) {
+
+        this.logPolicy.trace('Call AchievementController.updateAchievementContent', 'Call');
+
+        try {
+            command.key = key;
 
             const response = await this.commandBus.execute(command) as HandlerResponse;
 
