@@ -21,8 +21,16 @@ export class AchievementRepository extends CommonRepository {
         this.logPolicy.trace('Init AchievementRepository', 'Init');
     }
 
-    async saveAchievement(entity: Achievement): Promise<Achievement> {
-        this.logPolicy.trace('Call AchievementRepository.saveAchievement', 'Call');
+    async saveAchievementEntity(entity: Achievement): Promise<Achievement> {
+        this.logPolicy.trace('Call AchievementRepository.saveAchievementEntity', 'Call');
+
+        const savedEntity = await this.mongodbProvider.saveAchievementEntity(entity);
+
+        return savedEntity;
+    }
+
+    async saveAchievementDto(entity: Achievement): Promise<Achievement> {
+        this.logPolicy.trace('Call AchievementRepository.saveAchievementDto', 'Call');
 
         // Convert the domain entity into a data transfer object
         const achievementDto = DataModel.AchievementFullDto.fromDomain(entity);
@@ -30,8 +38,8 @@ export class AchievementRepository extends CommonRepository {
             return DataModel.AchevementMediaFullDto.fromDomain(val);
         });
 
-        await this.mongodbProvider.saveAchievement(achievementDto);
-        await this.azblobProvider.saveAchievementMedia(achievementMediaDto);
+        await this.mongodbProvider.saveAchievementDto(achievementDto);
+        await this.azblobProvider.saveAchievementMediaDto(achievementMediaDto);
 
         // If the meia was saved sucessfully, clear the buffer so the image is not ocupying memory space
         entity.media.forEach((item) => {

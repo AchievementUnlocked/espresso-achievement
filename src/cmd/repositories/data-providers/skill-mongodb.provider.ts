@@ -4,56 +4,36 @@ import { Model } from 'mongoose';
 
 import { LogPolicyService } from 'operational/logging';
 
-import * as DataModel from 'domain/schemas';
+import {Skill, SkillDocument} from 'domain/entities';
 
 @Injectable()
 export class SkillMongoDbProvider {
 
     constructor(
         private readonly logPolicy: LogPolicyService,
-        @InjectModel(DataModel.SkillFullDto.name)
-        private skillModel: Model<DataModel.SkillFullDocument>) {
+        @InjectModel(Skill.name)
+        private skillModel: Model<SkillDocument>) {
 
         this.logPolicy.trace('Init SkillMongoDbProvider', 'Init');
     }
 
-    async getSkills(): Promise<DataModel.SkillFullDto[]> {
+    async getSkills(): Promise<Skill[]> {
         this.logPolicy.trace('Call SkillMongoDbProvider.getSkills', 'Call');
 
         // const dtoList = await this.skillModel.find().exec();
-        const dtoList = new Array<DataModel.SkillFullDto>();
+        const entities = new Array<Skill>();
 
-        dtoList.push({
-            key: 'str',
-            name: 'strength',
-            abreviation: 'str'
-        }, {
-            key: 'dex',
-            name: 'dexterity',
-            abreviation: 'dex'
-        }, {
-            key: 'con',
-            name: 'constitution',
-            abreviation: 'con'
-        }, {
-            key: 'int',
-            name: 'intelligence',
-            abreviation: 'int'
-        }, {
-            key: 'wis',
-            name: 'wisdom',
-            abreviation: 'wis'
-        }, {
-            key: 'cha',
-            name: 'charisma',
-            abreviation: 'cha'
-        }, {
-            key: 'luc',
-            name: 'luck',
-            abreviation: 'luc'
-        });
+        entities.push(
+            new Skill( 'str','strength', 'str'), 
+            new Skill( 'dex','dexterity', 'dex'),
+            new Skill( 'con','constitution', 'con'),
+            new Skill( 'int','intelligence', 'int'),
+            new Skill( 'wis','wisdom', 'wis'),
+            new Skill( 'cha','charisma', 'cha'),
+            new Skill( 'luc','luck', 'luc'),
+        );
 
-        return dtoList;
+        return entities;
     }
 
 }

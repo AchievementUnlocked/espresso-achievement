@@ -30,9 +30,10 @@ export class AchievementAzblobProvider {
         this.clientUrl = this.configPolicy.get('AZBLOB_ACHIEVEMENT_CLIENT_URL_PATH');
     }
 
-    async saveAchievementMedia(dto: AchevementMediaFullDto[]) {
-        const sharedKeyCredential = new StorageSharedKeyCredential(this.accountName, this.accountKey);
+    async saveAchievementMediaDto(dto: AchevementMediaFullDto[]) {
+        this.logPolicy.trace('Call AchievementAzblobProvider.saveAchievementMediaDto', 'Call');
 
+        const sharedKeyCredential = new StorageSharedKeyCredential(this.accountName, this.accountKey);
         const containerClient = new ContainerClient(this.clientUrl, sharedKeyCredential);
 
         dto.forEach(async dtoItem => {

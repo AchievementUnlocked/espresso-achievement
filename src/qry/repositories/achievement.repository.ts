@@ -5,8 +5,11 @@ import { LogPolicyService } from 'operational/logging';
 
 import { CreateAchievementCommand } from 'domain/commands';
 
-import { AchievementFullDto, AchievementSummaryDto } from 'domain/schemas';
+import * as DataModel from 'domain/schemas';
+import { Achievement } from 'domain/entities';
+
 import { AchievementMongoDbProvider } from 'qry/repositories/data-providers';
+
 
 @Injectable()
 export class AchievementRepository {
@@ -21,7 +24,7 @@ export class AchievementRepository {
         this.logPolicy.trace('Init AchievementRepository', 'Init');
     }
 
-    async getSummaryAll(): Promise<AchievementSummaryDto[]> {
+    async getSummaryAll(): Promise<DataModel.AchievementSummaryDto[]> {
 
         this.logPolicy.trace('Call AchievementRepository.getSummaryAll', 'Call');
 

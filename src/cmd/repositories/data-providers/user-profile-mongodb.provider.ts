@@ -4,25 +4,25 @@ import { Model } from 'mongoose';
 
 import { LogPolicyService } from 'operational/logging';
 
-import * as DataModel from 'domain/schemas';
+import {UserProfile, UserProfileDocument} from 'domain/entities';
 
 @Injectable()
 export class UserProfileMongoDBProvider {
 
     constructor(
         private readonly logPolicy: LogPolicyService,
-        @InjectModel(DataModel.UserProfileFullDto.name)
-        private userProfileModel: Model<DataModel.UserProfileFullDocument>) {
+        @InjectModel(UserProfile.name)
+        private userProfileModel: Model<UserProfileDocument>) {
 
         this.logPolicy.trace('Init UserProfileMongoDBProvider', 'Init');
     }
 
-    async getUserProfile(user: string): Promise<DataModel.UserProfileFullDto> {
+    async getUserProfile(user: string): Promise<UserProfile> {
         this.logPolicy.trace('Call UserProfileMongoDBProvider.getUserProfile', 'Call');
 
-        const dto = await this.userProfileModel.findOne({ userName: user }).exec();
+        const entity = await this.userProfileModel.findOne({ userName: user }).exec();
 
-        return dto;
+        return entity;
     }
 
 }

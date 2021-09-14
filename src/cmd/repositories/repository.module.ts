@@ -6,6 +6,8 @@ import { OperationalConfigModule, ConfigPolicyService } from 'operational/config
 import { OperationalLoggingModule, LogPolicyService } from 'operational/logging';
 import { OperationalErrorModule, ErrorPolicyService } from 'operational/exception';
 
+import { Entity, Achievement, AchievementSchema, Skill, SkillSchema, AchievementMedia, AchievementMediaSchema, UserProfile, UserProfileSchema } from 'domain/entities';
+
 import { AchievementFullDto, AchievementFullSchema, SkillFullDto, SkillFullSchema, UserProfileFullDto, UserProfileFullSchema } from 'domain/schemas';
 import { AchievementMongoDBProvider, UserProfileMongoDBProvider, AchievementAzblobProvider, SkillCacheProvider, SkillMongoDbProvider, MongodbConfigService } from 'cmd/repositories/data-providers';
 
@@ -28,6 +30,27 @@ import { AchievementRepository, UserProfileRepository, SkillRepository } from 'c
             }),
             inject: [ConfigService]
         }),
+
+        /*
+        MongooseModule.forFeature([
+            { 
+                name: Entity.name, 
+                schema: EntitySchema,
+                discriminators:[
+                    { name: Skill.name, schema: SkillSchema },
+                    { name: UserProfile.name, schema: UserProfileSchema },
+                    { name: AchievementMedia.name, schema: AchievementMediaSchema },
+                    { name: Achievement.name, schema: AchievementSchema }
+                ]
+            }
+        ]),
+        */
+        
+        MongooseModule.forFeature([{ name: Skill.name, schema: SkillSchema }]),
+        MongooseModule.forFeature([{ name: UserProfile.name, schema: UserProfileSchema }]),
+        MongooseModule.forFeature([{ name: AchievementMedia.name, schema: AchievementMediaSchema }]),        
+        MongooseModule.forFeature([{ name: Achievement.name, schema: AchievementSchema }]),
+        
 
         MongooseModule.forFeature([{ name: AchievementFullDto.name, schema: AchievementFullSchema }]),
         MongooseModule.forFeature([{ name: UserProfileFullDto.name, schema: UserProfileFullSchema }]),

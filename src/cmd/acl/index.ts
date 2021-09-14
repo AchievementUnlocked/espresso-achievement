@@ -1,0 +1,1 @@
+export {UserAclController} from './user-acl.controller';

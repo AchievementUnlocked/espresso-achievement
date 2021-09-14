@@ -11,12 +11,14 @@ import { LogPolicyService, LogRequestInterceptor } from 'operational/logging';
 import { AppExceptionFilter } from 'operational/exception';
 
 // Inner application dependencies
+import { Achievement } from 'domain/entities';
 import { CreateAchievementCommand, CreateAchievementMediaCommand } from 'domain/commands';
 import { HandlerResponse } from 'cmd/handlers/command-handlers';
 
 // Innermodule dependencies
-import { CommonController, ControlerErrors } from 'cmd/controllers';
-import { FormDataToCommandPipe } from 'cmd/controllers/helpers';
+import { CommonController, ControlerErrors } from 'cmd/api';
+import { FormDataToCommandPipe } from 'cmd/api/helpers';
+
 
 @Controller('achievement/cmd')
 @UseInterceptors(LogRequestInterceptor)
@@ -50,7 +52,8 @@ export class AchievementCmdController extends CommonController {
             const response = await this.commandBus.execute(command) as HandlerResponse;
 
             this.logPolicy.debug('RESPONSE');
-            this.logPolicy.debug(response);
+            const entity = response.data as Achievement;
+            this.logPolicy.debug(`${entity.key} : ${entity.title}`);
 
             return response;
         } catch (error) {

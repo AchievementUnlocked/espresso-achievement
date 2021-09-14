@@ -37,15 +37,17 @@ export class CreateAchievementCommandHandler
     this.logPolicy.trace('Call CreateAchievementCommandHandler:execute', 'Call');
 
     const entity = await this.mapToEntity(command);
-    const savedEntity = await this.achievementRepository.saveAchievement(entity);
 
-    // ! There is o need to send an event right now, since we're moving the writing of the de-normalized achivement in this command service
-    // Raise handle complete event
-    // const completedEvent = new CreateAchievementCompletedEvent(savedEntity);
+    await this.achievementRepository.saveAchievementEntity(entity);
+
+    await this.achievementRepository.saveAchievementDto(entity);
+
+    // TODO: Event Handler: Raise handle complete event
+    // const completedEvent = new CreateAchievementCompletedEvent(entity);
     // this.eventBus.publish(completedEvent);
 
     // if the operation was successful, then we set the saved entity in the response
-    const response = new HandlerResponse(savedEntity);
+    const response = new HandlerResponse(entity);
 
     return response;
   }

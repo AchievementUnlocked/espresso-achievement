@@ -3,7 +3,7 @@ import { Cache } from 'cache-manager';
 
 import { LogPolicyService } from 'operational/logging';
 
-import * as DataModel from 'domain/schemas';
+import { Skill } from 'domain/entities';
 
 @Injectable()
 export class SkillCacheProvider {
@@ -17,23 +17,23 @@ export class SkillCacheProvider {
         this.logPolicy.trace('Init SkillCacheProvider', 'Init');
     }
 
-    async getSkills(setterCallback: () => Promise<DataModel.SkillFullDto[]>): Promise<DataModel.SkillFullDto[]> {
+    async getSkills(setterCallback: () => Promise<Skill[]>): Promise<Skill[]> {
         this.logPolicy.trace('Call SkillCacheProvider.getSkills', 'Call');
 
-        let dtoList = new Array<DataModel.SkillFullDto>();
+        let entities = new Array<Skill>();
 
-        dtoList = await this.cacheManager.get(this.SKILL_CACHE_KEY);
+        entities = await this.cacheManager.get(this.SKILL_CACHE_KEY);
 
-        if (!dtoList) {
+        if (!entities) {
             this.logPolicy.error(`CACHE IS EMPTY FOR '${this.SKILL_CACHE_KEY}'`);
-            dtoList = await setterCallback();
+            entities = await setterCallback();
 
-            if (dtoList && dtoList.length > 0) {
-                await this.cacheManager.set(this.SKILL_CACHE_KEY, dtoList, { ttl: 24 * 60 * 60 });
+            if (entities && entities.length > 0) {
+                await this.cacheManager.set(this.SKILL_CACHE_KEY, entities, { ttl: 24 * 60 * 60 });
             }
         }
 
-        return dtoList as DataModel.SkillFullDto[];
+        return entities;
     }
 
 }

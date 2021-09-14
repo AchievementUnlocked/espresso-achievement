@@ -4,8 +4,6 @@ import { LogPolicyService } from 'operational/logging';
 
 import { UserProfile } from 'domain/entities';
 
-import * as DataModel from 'domain/schemas';
-
 import { UserProfileMongoDBProvider } from './data-providers';
 
 import { CommonRepository } from '.';
@@ -25,8 +23,8 @@ export class UserProfileRepository extends CommonRepository {
         this.logPolicy.trace('Call UserProfileRepository.getUserProfile', 'Call');
 
         // TODO: REFACTOR - Try to ge tthe user profile from the cache first, then from the mongoDB repository
-        const dto = await this.mongodbProvider.getUserProfile(userName);
+        const entity = await this.mongodbProvider.getUserProfile(userName);
 
-        return DataModel.UserProfileFullDto.toDomain(dto);
+        return entity;
     }
 }

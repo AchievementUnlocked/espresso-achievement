@@ -1,6 +1,6 @@
 import { AppExceptionReason, AppException } from 'operational/exception';
 
-import { ControlerErrors } from '../../cmd/controllers';
+import { ControlerErrors } from '.';
 
 export class CommonController {
 

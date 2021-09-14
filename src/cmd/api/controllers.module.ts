@@ -7,7 +7,7 @@ import { OperationalLoggingModule, LogPolicyService } from 'operational/logging'
 import { OperationalErrorModule, ErrorPolicyService } from 'operational/exception';
 
 import { HandlersModule, CommandHandlers, EventHandlers } from 'cmd/handlers';
-import { AchievementCmdController } from 'cmd/controllers';
+import { AchievementCmdController } from 'cmd/api';
 
 @Module({
   imports: [

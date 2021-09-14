@@ -20,6 +20,17 @@ async function bootstrapQry() {
   appQry.setGlobalPrefix(configService.get<string>('API_PREFIX'));
   appQry.useGlobalFilters(new GlobalExceptionFilter());
 
+
+  const config = new DocumentBuilder()
+    .setTitle('Espresso Achievement QRY')
+    .setDescription('The cats API description')
+    .setVersion('1.0')
+    .addTag('Achievement Qry')
+    .build();
+  const document = SwaggerModule.createDocument(appQry, config);
+  SwaggerModule.setup('api/achievement/qry', appQry, document);
+
+
   await appQry.listen(configService.get<number>('API_QRY_PORT'));
 
   console.log(chalk.hex('#2ECC71')(`Espresso Achievement QRY.  Env: ${process.env.NODE_ENV} Port:${configService.get<number>('API_QRY_PORT')}`));
@@ -33,6 +44,16 @@ async function bootstrapCmd() {
   appCmd.enableCors({ origin: [configService.get<string>('API_CORS_ALLOWED_ORIGINS')] });
   appCmd.setGlobalPrefix(configService.get<string>('API_PREFIX'));
   appCmd.useGlobalFilters(new GlobalExceptionFilter());
+
+
+  const config = new DocumentBuilder()
+    .setTitle('Espresso Achievement CMD')
+    .setDescription('The cats API description')
+    .setVersion('1.0')
+    .addTag('Achievement Cmd')
+    .build();
+  const document = SwaggerModule.createDocument(appCmd, config);
+  SwaggerModule.setup('api/achievement/cmd', appCmd, document);
 
   await appCmd.listen(configService.get<number>('API_CMD_PORT'));
 

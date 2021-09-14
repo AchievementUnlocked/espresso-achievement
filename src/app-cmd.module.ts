@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule } from '@nestjs/config';
 
-import { AchievementCmdController } from './cmd/controllers';
+import { AchievementCmdController } from './cmd/api';
 import { HandlersModule as CmdHandlersModule } from 'cmd/handlers';
 
 import { OperationalConfigModule } from 'operational/configuration';
