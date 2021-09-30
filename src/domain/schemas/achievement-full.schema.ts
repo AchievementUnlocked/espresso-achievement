@@ -45,21 +45,25 @@ export class AchievementFullDto {
         dto.description = entity.description;
         dto.completedDate = entity.completedDate;
         dto.visibility = entity.visibility;
-        
-        dto.skills = entity.skills.map((val, idx) => {
-            return SkillFullDto.fromDomain(val);
-        });
 
-        dto.media = entity.media.map((val, idx) => {
-            return AchievementMediaFullDto.fromDomain(val);
-        });
+        dto.skills = entity.skills
+            ? entity.skills.map((val, idx) => {
+                return SkillFullDto.fromDomain(val);
+            })
+            : [];
+
+        dto.media = entity.media
+            ? entity.media.map((val, idx) => {
+                return AchievementMediaFullDto.fromDomain(val);
+            })
+            : [];
 
         dto.userProfile = UserProfileFullDto.fromDomain(entity.userProfile);
 
         return dto;
     }
 
-    
+
     /*
     static fromCreateCommand(command: CreateAchievementCommand): AchievementFullDto {
 

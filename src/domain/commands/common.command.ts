@@ -1,9 +1,9 @@
 import moment from 'moment';
 
 export class CommonCommand {
-    readonly id: string;
+    readonly id?: string;
 
-    readonly timestamp: Date;
+    readonly timestamp?: Date;
 
     constructor() {
         this.timestamp = moment().utc().toDate();

@@ -26,7 +26,7 @@ export class SkillRepository extends CommonRepository {
 
         const dtoList = await this.cacheProvider.getSkills(async () => this.mongoDbProvider.getSkills());
 
-        return dtoList.map((item) => DataModel.SkillFullDto.toDomain(item));
+        return dtoList;
     }
 
 }

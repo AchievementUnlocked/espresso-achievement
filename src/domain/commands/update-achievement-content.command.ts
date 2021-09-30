@@ -16,38 +16,16 @@ enum AchievementVisibilityEnum {
 
 export class UpdateAchievementContentCommand extends CommonCommand implements ICommand {
 
+    @IsString({ message: PropertyErrors.IsNotString })
+    @IsNotEmpty({ message: PropertyErrors.IsEmpty })
     key: string;
 
-    // @ApiModelProperty()
-    @IsString({ message: PropertyErrors.IsNotString })
-    @IsNotEmpty({ message: PropertyErrors.IsEmpty })
-    @Length(1, Constants.TITLE_MAX_LENGTH, { message: PropertyErrors.IsMaxLength })
-    title: string;
-
-    // @ApiModelProperty()
-    @IsString({ message: PropertyErrors.IsNotString })
-    @IsNotEmpty({ message: PropertyErrors.IsEmpty })
-    @Length(1, Constants.DESCRIPTION_MAX_LENGTH, { message: PropertyErrors.IsMaxLength })
-    description: string;
-
-    // @ApiModelProperty({ type: Date })
-    @Type(() => Date)
-    @IsDate({ message: PropertyErrors.IsNotDate })
-    completedDate: Date;
-
-    // @ApiModelProperty({ type: [String] })
-    @IsArray({ message: PropertyErrors.IsNotArray })
-    skills: string[];
-
-    // @ApiModelProperty({ type: AchievementVisibilityEnum })
-    @IsEnum(AchievementVisibilityEnum, { message: PropertyErrors.IsNotValidEnum })
-    visibility: AchievementVisibilityEnum;
-
-    // @ApiModelProperty()
-    @IsString({ message: PropertyErrors.IsNotString })
-    @IsNotEmpty({ message: PropertyErrors.IsEmpty })
-    @Length(1, Constants.USERNAME_MAX_LENGTH, { message: PropertyErrors.IsMaxLength })
-    userName: string;
+    title?: string;
+    description?: string;
+    completedDate?: Date;
+    skills?: string[];
+    visibility?: number;
+    userName?: string;
 
     constructor() {
         super();

@@ -10,13 +10,9 @@ import { Constants, ConfigValidationSchema } from '.';
 
 @Injectable()
 export class ConfigPolicyService {
-    // private readonly envPath;
-    private readonly envConfig: { [key: string]: string };
 
     constructor(private configService: ConfigService) {
-        // this.envConfig = dotenv.parse(fs.readFileSync(Constants.ENV_FILE_PATH));
-
-        console.log('Init ConfigPolicyService : ' + this.get('DUMMY'), 'Init');
+        // console.log('Init ConfigPolicyService : Init');
     }
 
     /**
@@ -30,41 +26,4 @@ export class ConfigPolicyService {
         return this.configService.get<string>(key);
     }
 
-    /**
-     * Validates the configuration file with a base schema.
-     * If the configuration fails it will throw an error;
-     * otherwise, the configuration is validated successfully
-     * @private
-     * @memberof ConfigPolicyService
-     */
-    private validateConfigSchema() {
-        /*
-                registerSchema(ConfigValidationSchema.schema);
-
-                const options: ValidatorOptions = {
-                    skipMissingProperties: true,
-                };
-
-                validate(Constants.CONFIG_SCHEMA_NAME, this.envConfig, options)
-                .then(errors => {
-
-                    const errorObj = {
-                        message: 'Configuration Schema Is Invalid',
-                        details: errors,
-                    };
-
-                    // throw new Error(JSON.stringify(errorObj, null, 2));
-                    console.error(JSON.stringify(errorObj, null, 2));
-                })
-                .catch(error => {
-                    const errorObj = {
-                        message: 'Configuration Schema Vallidator Failed',
-                        details: error,
-                    };
-
-                    // throw new Error(JSON.stringify(errorObj, null, 2));
-                    console.error(JSON.stringify(errorObj, null, 2));
-                });
-        */
-    }
 }
