@@ -1,6 +1,6 @@
 import { CommonRepository } from '.';
 
-describe('CommonRepository', () => {
+describe('Common Repository', () => {
   it('should be defined', () => {
     expect(new CommonRepository()).toBeDefined();
   });

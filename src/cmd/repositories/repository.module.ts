@@ -30,21 +30,6 @@ import { AchievementRepository, UserProfileRepository, SkillRepository } from 'c
             }),
             inject: [ConfigService]
         }),
-
-        /*
-        MongooseModule.forFeature([
-            { 
-                name: Entity.name, 
-                schema: EntitySchema,
-                discriminators:[
-                    { name: Skill.name, schema: SkillSchema },
-                    { name: UserProfile.name, schema: UserProfileSchema },
-                    { name: AchievementMedia.name, schema: AchievementMediaSchema },
-                    { name: Achievement.name, schema: AchievementSchema }
-                ]
-            }
-        ]),
-        */
         
         MongooseModule.forFeature([{ name: Skill.name, schema: SkillSchema }]),
         MongooseModule.forFeature([{ name: UserProfile.name, schema: UserProfileSchema }]),

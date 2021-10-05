@@ -35,13 +35,13 @@ export class CreateAchievementCommand extends CommonCommand implements ICommand 
 
     // @ApiModelProperty({ type: [String] })
     @IsArray({ message: PropertyErrors.IsNotArray })
-    skills: string[];
+    skills?: string[];
 
     // @ApiModelProperty({ type: AchievementVisibilityEnum })
     @IsEnum(AchievementVisibilityEnum, { message: PropertyErrors.IsNotValidEnum })
-    visibility: AchievementVisibilityEnum;
+    visibility?: AchievementVisibilityEnum;
 
-    media: CreateAchievementMediaCommand[];
+    media?: CreateAchievementMediaCommand[];
 
     // @ApiModelProperty()
     @IsString({ message: PropertyErrors.IsNotString })

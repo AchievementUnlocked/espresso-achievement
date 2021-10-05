@@ -4,7 +4,7 @@ import moment from 'moment';
 
 export class Entity {
 
-    _id: string;
+    _id?: string;
    
     key: string;
 

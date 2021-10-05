@@ -2,9 +2,9 @@ import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
 import { NotImplementedException } from '@nestjs/common';
 
 import { LogPolicyService } from 'operational/logging';
-import { ErrorPolicyService } from 'operational/exception';
+import { EntityNotFoundException, ErrorPolicyService, InvalidCommandException } from 'operational/exception';
 
-import { Achievement, AchievementMedia, Skill } from 'domain/entities';
+import { Achievement, AchievementMedia, AchievementVisibility, Skill } from 'domain/entities';
 import { CreateAchievementCommand } from 'domain/commands';
 import { CreateAchievementCompletedEvent } from 'domain/events';
 import { CodeGeneratorUtil, MimeTypeUtil } from 'domain/utils';
@@ -22,6 +22,7 @@ export class CreateAchievementCommandHandler
 
   constructor(
     private readonly logPolicy: LogPolicyService,
+    private readonly errorPolicy: ErrorPolicyService,
     private readonly eventBus: EventBus,
     private readonly achievementRepository: AchievementRepository,
     private readonly userProfileRepository: UserProfileRepository,
@@ -34,20 +35,34 @@ export class CreateAchievementCommandHandler
 
   async execute(command: CreateAchievementCommand): Promise<HandlerResponse> {
 
-    this.logPolicy.trace('Call CreateAchievementCommandHandler:execute', 'Call');
+    let response: HandlerResponse;
 
-    const entity = await this.mapToEntity(command);
+    try {
+      this.logPolicy.trace('Call CreateAchievementCommandHandler:execute', 'Call');
 
-    await this.achievementRepository.saveAchievementEntity(entity);
+      if (command) {
+        const entity = await this.mapToEntity(command);
 
-    await this.achievementRepository.saveAchievementDto(entity);
+        await this.achievementRepository.saveAchievementEntity(entity);
 
-    // TODO: Event Handler: Raise handle complete event
-    // const completedEvent = new CreateAchievementCompletedEvent(entity);
-    // this.eventBus.publish(completedEvent);
+        await this.achievementRepository.saveAchievementDto(entity);
 
-    // if the operation was successful, then we set the saved entity in the response
-    const response = new HandlerResponse(entity);
+        // TODO: Event Handler: Raise handle complete event
+        // const completedEvent = new CreateAchievementCompletedEvent(entity);
+        // this.eventBus.publish(completedEvent);
+
+        // if the operation was successful, then we set the saved entity in the response
+        response = new HandlerResponse(entity);
+      }
+      else {
+        throw new InvalidCommandException('The provided command is null or invalid');
+      }
+
+    } catch (error) {
+      response = new HandlerResponse(null, error, command);
+
+      this.errorPolicy.handleError(error);
+    }
 
     return response;
   }
@@ -56,35 +71,50 @@ export class CreateAchievementCommandHandler
 
     this.logPolicy.trace('Call CreateAchievementCommandHandler.mapToEntity', 'Call');
 
-    const entity = new Achievement(CodeGeneratorUtil.GenerateShortCode());
+    const userProfile = await this.userProfileRepository.getUserProfile(command.userName);
 
-    entity.title = command.title;
-    entity.description = command.description;
-    entity.completedDate = command.completedDate;
-    entity.visibility = command.visibility as number;
+    if (userProfile) {
+      const entity = new Achievement(CodeGeneratorUtil.GenerateShortCode());
 
-    const skills = await this.skillRepository.getSkills();
+      entity.userProfile = userProfile;
 
-    entity.skills = skills.filter(item => command.skills.indexOf(item.key) !== -1);
+      entity.title = command.title;
+      entity.description = command.description;
+      entity.completedDate = command.completedDate;
 
-    entity.media = command.media.map((val, idx) => {
-      const mediaEntity = new AchievementMedia(CodeGeneratorUtil.GenerateShortCode());
+      entity.visibility = command.visibility
+        ? command.visibility as number
+        : AchievementVisibility.Private;
 
-      // Get the extension from the mmime type of teh file
-      const extension = MimeTypeUtil.getExtension(val.mimeType);
+      const skills = await this.skillRepository.getSkills();
 
-      mediaEntity.mediaPath = `${entity.key}/${mediaEntity.key}_${idx}.${extension}`;
-      mediaEntity.originalName = val.originalName;
-      mediaEntity.mimeType = val.mimeType;
-      mediaEntity.size = val.size;
-      mediaEntity.buffer = val.buffer;
+      entity.skills = command.skills && command.skills.length > 0
+        ? skills.filter(item => command.skills.indexOf(item.key) !== -1)
+        : [];
 
-      return mediaEntity;
-    });
+      entity.media = command.media && command.media.length > 0
+        ? command.media.map((val, idx) => {
+          const mediaEntity = new AchievementMedia(CodeGeneratorUtil.GenerateShortCode());
 
-    entity.userProfile = await this.userProfileRepository.getUserProfile(command.userName);
+          // Get the extension from the mmime type of teh file
+          const extension = MimeTypeUtil.getExtension(val.mimeType);
 
-    return entity;
+          mediaEntity.mediaPath = `${entity.key}/${mediaEntity.key}_${idx}.${extension}`;
+          mediaEntity.originalName = val.originalName;
+          mediaEntity.mimeType = val.mimeType;
+          mediaEntity.size = val.size;
+          mediaEntity.buffer = val.buffer;
+
+          return mediaEntity;
+        })
+        : [];
+
+
+      return entity;
+    }
+    else {
+      throw new EntityNotFoundException(`The user profile entity with userName '${command.userName}' was not found.`);
+    }
   }
 
   async mergeToEntity(command: CreateAchievementCommand, entity: Achievement): Promise<Achievement> {
