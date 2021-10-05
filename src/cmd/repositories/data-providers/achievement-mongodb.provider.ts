@@ -12,10 +12,11 @@ export class AchievementMongoDBProvider {
 
     constructor(
         private readonly logPolicy: LogPolicyService,
+
         @InjectModel(Achievement.name)
         private achievementEntityModel: Model<AchievementDocument>,
         @InjectModel(DataModel.AchievementFullDto.name)
-        private achievementModel: Model<DataModel.AchievementFullDocument>) {
+        private achievementDtoModel: Model<DataModel.AchievementFullDocument>) {
 
         this.logPolicy.trace('Init AchievementMongoDBProvider', 'Init');
     }
@@ -50,7 +51,7 @@ export class AchievementMongoDBProvider {
         // const createdAchievement = new this.achievementModel(dto);
         // const document = await createdAchievement.save();
 
-        const document = await this.achievementModel.findOneAndUpdate(
+        const document = await this.achievementDtoModel.findOneAndUpdate(
             { key: dto.key },
             dto,
             { returnOriginal: false, upsert: true, useFindAndModify : false }

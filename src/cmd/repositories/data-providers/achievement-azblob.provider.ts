@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ContainerClient, StorageSharedKeyCredential } from '@azure/storage-blob';
+import { BlockBlobClient, ContainerClient, StorageSharedKeyCredential } from '@azure/storage-blob';
 
 import { ConfigPolicyService } from 'operational/configuration';
 import { LogPolicyService } from 'operational/logging';
@@ -33,23 +33,28 @@ export class AchievementAzblobProvider {
     async saveAchievementMediaDto(dto: AchevementMediaFullDto[]) {
         this.logPolicy.trace('Call AchievementAzblobProvider.saveAchievementMediaDto', 'Call');
 
-        const sharedKeyCredential = new StorageSharedKeyCredential(this.accountName, this.accountKey);
-        const containerClient = new ContainerClient(this.clientUrl, sharedKeyCredential);
-
         dto.forEach(async dtoItem => {
-            const blockBlobClient = containerClient.getBlockBlobClient(`${this.mediaBasePath}/${dtoItem.mediaPath}`);
+            const blockBlobClient = this.createBlockBlobClient(`${this.mediaBasePath}/${dtoItem.mediaPath}`);
 
             const uploadBlobResponse = await blockBlobClient.upload(dtoItem.buffer, dtoItem.buffer.length);
 
             // check if the status code is 20x
-            if ((uploadBlobResponse._response.status % 200)  < 100) {
-                this.logPolicy.debug(`Success: Uploading block blob ${dtoItem.mediaPath} HTTP ${uploadBlobResponse._response.status}`);                       
+            if ((uploadBlobResponse._response.status % 200) < 100) {
+                this.logPolicy.debug(`Success: Uploading block blob ${dtoItem.mediaPath} HTTP ${uploadBlobResponse._response.status}`);
             } else {
                 this.logPolicy.error(`Error: Uploading block blob ${dtoItem.mediaPath} HTTP ${uploadBlobResponse._response.status}`);
 
                 throw new AUError(`Error: Uploading block blob ${dtoItem.mediaPath} HTTP ${uploadBlobResponse._response.status}`);
             }
         });
+    }
+
+     
+    protected createBlockBlobClient(path: string): BlockBlobClient {
+
+        const sharedKeyCredential = new StorageSharedKeyCredential(this.accountName, this.accountKey);
+        const containerClient = new ContainerClient(this.clientUrl, sharedKeyCredential);
+        return containerClient.getBlockBlobClient(path);
     }
 
 }

@@ -1,19 +1,68 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { AchievementAzblobProvider } from '.';
+import { ConfigPolicyService } from '../../../operational/configuration';
+import { LogPolicyService } from '../../../operational/logging';
+import { InvalidEntityException } from '../../../operational/exception';
 
-describe('AchievementAzblobProvider', () => {
+import { AchievementAzblobProvider } from '.';
+import { AchevementMediaFullDto } from '../../../domain/schemas';
+
+
+class AchievementAzblobProviderTest extends AchievementAzblobProvider
+{
+  constructor(
+    configPolicy: ConfigPolicyService,
+    logPolicy: LogPolicyService)
+    {
+      super(configPolicy, logPolicy);
+    }
+
+    override createBlockBlobClient(path: string): any {
+      return super.createBlockBlobClient(path);
+    }
+}
+
+describe('Achievement Az Blob Provider', () => {
+  let configPolicy: ConfigPolicyService;
+  let logPolicy: LogPolicyService;
   let provider: AchievementAzblobProvider;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [AchievementAzblobProvider],
-    }).compile();
+  beforeAll(() => {
 
-    provider = module.get<AchievementAzblobProvider>(AchievementAzblobProvider);
+    configPolicy = new ConfigPolicyService(null);
+    jest.spyOn(configPolicy, 'get').mockImplementation((key) => `${key}_Value`);
+
+    logPolicy = new LogPolicyService(configPolicy);
+    jest.spyOn(logPolicy, 'trace').mockImplementation((msg, ctx) => { });
+
+    provider = new AchievementAzblobProvider(configPolicy, logPolicy);
   });
 
-  it('should be defined', () => {
-    expect(provider).toBeDefined();
+
+  describe('Constructor', () => {
+
+    it('should be defined', () => {
+      expect(provider).toBeDefined();
+    });
+
   });
+
+
+  describe('saveAchievementMediaDto', () => {
+
+
+
+    it('Should save the dtowhen a valid dto is provided', () => {
+
+      const dto: AchevementMediaFullDto[] = [];
+
+      // async saveAchievementMediaDto(dto: AchevementMediaFullDto[]) {
+      
+
+    });
+
+
+  });
+
+
 });

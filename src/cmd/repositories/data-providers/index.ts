@@ -1,6 +1,5 @@
 export { AchievementMongoDBProvider } from './achievement-mongodb.provider';
 export { AchievementAzblobProvider } from './achievement-azblob.provider';
-export { AchievementConsoleDbProvider } from './achievement-console.provider';
 
 export { UserProfileMongoDBProvider } from './user-profile-mongodb.provider';
 
