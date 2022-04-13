@@ -4,8 +4,9 @@ import { Model } from 'mongoose';
 
 import { LogPolicyService } from 'operational/logging';
 
-import { Achievement, AchievementDocument } from 'domain/entities';
+import { Achievement, AchievementDocument, LikeAction, LikeActionDocument } from 'domain/entities';
 import * as DataModel from 'domain/schemas';
+import { title } from 'process';
 
 @Injectable()
 export class AchievementMongoDBProvider {
@@ -15,8 +16,8 @@ export class AchievementMongoDBProvider {
 
         @InjectModel(Achievement.name)
         private achievementEntityModel: Model<AchievementDocument>,
-        @InjectModel(DataModel.AchievementFullDto.name)
-        private achievementDtoModel: Model<DataModel.AchievementFullDocument>) {
+        @InjectModel(LikeAction.name)
+        private likeEntityModel: Model<LikeActionDocument>) {
 
         this.logPolicy.trace('Init AchievementMongoDBProvider', 'Init');
     }
@@ -25,38 +26,38 @@ export class AchievementMongoDBProvider {
     async getAchievementEntity(key: string): Promise<Achievement> {
         this.logPolicy.trace('Call AchievementMongoDBProvider.getAchievementEntity', 'Call');
 
-        const document = await this.achievementEntityModel.findOne({ key: key }).exec();
+        const document = await this.achievementEntityModel.findOne({ key: key }).lean<Achievement>().exec();
 
         return document;
     }
+
 
     async saveAchievementEntity(entity: Achievement): Promise<Achievement> {
         this.logPolicy.trace('Call AchievementMongoDBProvider.saveAchievementEntity', 'Call');
 
-        // const createdAchievement = new this.achievementEntityModel(entity);
-        // const document = await createdAchievement.save();
-
         const document = await this.achievementEntityModel.findOneAndUpdate(
+            // { key: entity.key, timestamp: { $lte: entity.timestamp } },
             { key: entity.key },
             entity,
-            { returnOriginal: false, upsert: true, useFindAndModify : false }
+            { returnOriginal: false, upsert: true, useFindAndModify: false }
         );
+
+        this.logPolicy.debug(document);
 
         return document;
     }
 
-    async saveAchievementDto(dto: DataModel.AchievementFullDto): Promise<DataModel.AchievementFullDto> {
-        this.logPolicy.trace('Call AchievementMongoDBProvider.saveAchievementDto', 'Call');
 
-        // const createdAchievement = new this.achievementModel(dto);
-        // const document = await createdAchievement.save();
+    async saveAchievementLike(entity: LikeAction): Promise<LikeAction> {
+        this.logPolicy.trace('Call AchievementMongoDBProvider.saveAchievementLike', 'Call');
 
-        const document = await this.achievementDtoModel.findOneAndUpdate(
-            { key: dto.key },
-            dto,
-            { returnOriginal: false, upsert: true, useFindAndModify : false }
-        );
+        const document = await this.likeEntityModel.create(entity);
+
+        document.save({ checkKeys: false });
+
+        this.logPolicy.debug(document);
 
         return document;
     }
+
 }

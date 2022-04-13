@@ -18,8 +18,7 @@ export class MongodbConfigService implements MongooseOptionsFactory {
 
   createMongooseOptions(): MongooseModuleOptions {
     return {
-      uri: this.mongoDbConnectionString,
-      useCreateIndex: true,
+      uri: this.mongoDbConnectionString
     };
   }
 }

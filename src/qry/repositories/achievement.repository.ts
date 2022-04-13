@@ -1,15 +1,14 @@
+
+
 import { Injectable } from '@nestjs/common';
 
 import { ConfigPolicyService } from 'operational/configuration';
 import { LogPolicyService } from 'operational/logging';
-
-import { CreateAchievementCommand } from 'domain/commands';
+import { InvalidEntityException } from 'operational/exception';
 
 import * as DataModel from 'domain/schemas';
-import { Achievement } from 'domain/entities';
 
 import { AchievementMongoDbProvider } from 'qry/repositories/data-providers';
-
 
 @Injectable()
 export class AchievementRepository {
@@ -31,6 +30,25 @@ export class AchievementRepository {
         const response = await this.mongodbProvider.getSummaryAll();
 
         return response;
+    }
+
+    async saveAchievementDto(dto: DataModel.AchievementFullDto): Promise<DataModel.AchievementFullDto> {
+        this.logPolicy.trace('Call AchievementRepository.saveAchievementDto', 'Call');
+
+        if (dto) {
+            if (dto.userProfile) {
+
+                const savedDto = await this.mongodbProvider.saveAchievementDto(dto);
+
+                return savedDto;
+            }
+            else {
+                throw new InvalidEntityException("The provided achievment user is null or undefined");
+            }
+        }
+        else {
+            throw new InvalidEntityException("The provided achievment is null or undefined");
+        }
     }
 
 }

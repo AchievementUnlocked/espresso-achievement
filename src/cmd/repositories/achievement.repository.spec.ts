@@ -99,7 +99,7 @@ describe('Achievement Repository', () => {
     it('Should save the dto and return it when a valid entity is provided', async () => {
 
       const user: UserProfile = {
-        key: '123USR',
+        key: '123ABC',
         userName: 'testUser', firstName: 'Test', lastName: 'User',
         email: 'test@email.com',
         timestamp: new Date()
@@ -108,7 +108,7 @@ describe('Achievement Repository', () => {
       const media: AchievementMedia = {
         key: '123MDA',
         timestamp: new Date(),
-        mediaPath: '123USR/123MDA.jpg',
+        mediaPath: '123ABC/123MDA.jpg',
         originalName: 'media.jpg',
         mimeType: 'image/jpeg',
         size: 256,
@@ -145,7 +145,7 @@ describe('Achievement Repository', () => {
     it('Should save the dto and return it when a valid entity is provided with no skills or media', async () => {
 
       const user: UserProfile = {
-        key: '123USR',
+        key: '123ABC',
         userName: 'testUser', firstName: 'Test', lastName: 'User',
         email: 'test@email.com',
         timestamp: new Date()
@@ -185,7 +185,7 @@ describe('Achievement Repository', () => {
       const media: AchievementMedia = {
         key: '123MDA',
         timestamp: new Date(),
-        mediaPath: '123USR/123MDA.jpg',
+        mediaPath: '123ABC/123MDA.jpg',
         originalName: 'media.jpg',
         mimeType: 'image/jpeg',
         size: 256,

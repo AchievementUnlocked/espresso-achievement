@@ -5,7 +5,8 @@ import { ConfigPolicyService } from 'operational/configuration';
 import { LogPolicyService } from 'operational/logging';
 import { AUError } from 'operational/exception';
 
-import { AchevementMediaFullDto } from 'domain/schemas';
+import { AchievementMediaFullDto } from 'domain/schemas';
+import { AchievementMedia } from 'domain/entities';
 
 
 @Injectable()
@@ -30,7 +31,28 @@ export class AchievementAzblobProvider {
         this.clientUrl = this.configPolicy.get('AZBLOB_ACHIEVEMENT_CLIENT_URL_PATH');
     }
 
-    async saveAchievementMediaDto(dto: AchevementMediaFullDto[]) {
+    async saveAchievementMedia(entity: AchievementMedia) {
+        this.logPolicy.trace('Call AchievementAzblobProvider.saveAchievementMedia', 'Call');
+
+        const blockBlobClient = this.createBlockBlobClient(`${this.mediaBasePath}/${entity.mediaPath}`);
+
+        const uploadBlobResponse = await blockBlobClient.upload(entity.buffer, entity.buffer.length);
+
+        // check if the status code is 20x
+        if ((uploadBlobResponse._response.status % 200) < 100) {
+            this.logPolicy.debug(`Success: Uploading block blob ${entity.mediaPath} HTTP ${uploadBlobResponse._response.status}`);
+            
+            // If the media was saved successfully, we need to clear the buffer so it does not occupy the memory space
+            this.logPolicy.debug('CLEARING BUFFER FOR ' + entity.mediaPath);
+            entity.clearBuffer();
+        } else {
+            this.logPolicy.error(`Error: Uploading block blob ${entity.mediaPath} HTTP ${uploadBlobResponse._response.status}`);
+            
+            throw new AUError(`Error: Uploading block blob ${entity.mediaPath} HTTP ${uploadBlobResponse._response.status}`);
+        }
+    }
+
+    async saveAchievementMediaDto(dto: AchievementMediaFullDto[]) {
         this.logPolicy.trace('Call AchievementAzblobProvider.saveAchievementMediaDto', 'Call');
 
         dto.forEach(async dtoItem => {
@@ -49,7 +71,7 @@ export class AchievementAzblobProvider {
         });
     }
 
-     
+
     protected createBlockBlobClient(path: string): BlockBlobClient {
 
         const sharedKeyCredential = new StorageSharedKeyCredential(this.accountName, this.accountKey);

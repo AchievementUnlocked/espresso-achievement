@@ -5,8 +5,10 @@ import { OperationalConfigModule, ConfigPolicyService } from 'operational/config
 import { OperationalLoggingModule, LogPolicyService } from 'operational/logging';
 import { OperationalErrorModule, ErrorPolicyService } from 'operational/exception';
 
-import { HandlersModule, QueryHandlers } from 'qry/handlers';
-import { AchievementQryController } from 'qry/controllers';
+import { HandlersModule, QueryHandlers, EventHandlers } from 'qry/handlers';
+import { AchievementQryController } from 'qry/api';
+import { AchievementAclController } from 'qry/acl';
+
 
 @Module({
   imports: [
@@ -18,12 +20,14 @@ import { AchievementQryController } from 'qry/controllers';
   ],
   exports: [
     AchievementQryController,
+    AchievementAclController
   ],
   providers: [
     ConfigPolicyService,
     LogPolicyService,
     ErrorPolicyService,
-    ...QueryHandlers
+    ...QueryHandlers,
+    ...EventHandlers
   ]
 })
 export class ControllersModule { }

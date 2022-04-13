@@ -1,18 +1,23 @@
+import moment from 'moment';
+import { AggregateRoot } from '@nestjs/cqrs';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Entity, Aggregate, Skill, AchievementVisibility, AchievementMedia, UserProfile } from 'domain/entities';
+import { Entity, Aggregate, Skill, AchievementVisibility, AchievementMedia, UserProfile, LikeAction } from 'domain/entities';
+
+import { CodeGeneratorUtil, MimeTypeUtil } from 'domain/utils';
+import { AchievementCreatedEvent, AchievementContentUpdatedEvent, AchievementSkillsUpdatedEvent } from 'domain/events';
 
 export type AchievementDocument = Achievement & Entity & Document;
 
 @Schema({ collection: 'Achievement' })
-export class Achievement extends Entity {
+export class Achievement extends AggregateRoot {
 
     @Prop()
     key: string;
 
     @Prop()
     timestamp: Date;
-    
+
     @Prop()
     title: string;
 
@@ -31,13 +36,124 @@ export class Achievement extends Entity {
     @Prop([AchievementMedia])
     media: AchievementMedia[];
 
-    //@Prop({ type: typeof UserProfile})
+    @Prop([LikeAction])
+    likes: LikeAction[];
+
     @Prop()
     userProfile: UserProfile;
 
-    constructor(key: string) {
-        super(key);
+    @Prop()
+    createdBy: string;
+
+    @Prop()
+    updatedBy: string;
+
+    constructor(key: string = null, title: string = null, description: string = null, completedDate: Date = null, visibility: number = null,
+        userProfile: UserProfile = null, skills: Skill[] = null, media: AchievementMedia[] = null) {
+        super();
+
+        this.timestamp = moment().utc().toDate();
+
+        this.key = key || CodeGeneratorUtil.GenerateShortCode();
+
+        this.title = title;
+        this.description = description;
+        this.completedDate = completedDate;
+        this.visibility = visibility > 0 ? visibility : AchievementVisibility.Private;
+
+        this.likes = new Array<LikeAction>();
+
+        this.setUserProfile(userProfile, false);
+        this.setSkills(skills, false);
+        this.setMedia(media, false);
+
+        // register a created event only if content was provided
+        // Otherwise, this initialization is not a propper creation
+        if (title && completedDate && userProfile) {
+            this.apply(
+                new AchievementCreatedEvent(
+                    this.key, this.title, this.description, this.completedDate, this.visibility, this.userProfile.userName,
+                    this.skills.map((val) => { return val.key }),
+                    this.media.map((val) => { return { mediaPath: val.mediaPath, originalName: val.originalName, size: val.size, mimeType: val.mimeType } })
+                ));
+        }
     }
+
+    public setUserProfile(userProfile: UserProfile, raiseEvent: boolean = true) {
+        this.userProfile = userProfile;
+
+        if (raiseEvent) {
+            // TODO: Raise AchievementUserChanged event
+            // Will not set until it;s needed
+
+        }
+    }
+
+    public setSkills(skills: Skill[], raiseEvent: boolean = true) {
+        this.skills = skills;
+
+        if (raiseEvent) {
+            // TODO: Raise AchievementSkillsChanged event
+            // Will not set until it;s needed
+        }
+    }
+
+    public setMedia(media: AchievementMedia[], raiseEvent: boolean = true) {
+        // this.mediaPath = `${entity.key}/${this.key}.${extension}`;
+        this.media = media;
+
+        // Update the media path for each media object so that the base of the path matched the achievement key
+        if (this.media) {
+            this.media.forEach((val, idx) => {
+                val.mediaPath = `${this.key}/${val.mediaPath}`;
+            });
+        }
+
+        if (raiseEvent) {
+            // TODO: Raise AchievementMediaChanged event
+            // Will not set until it;s needed
+        }
+    }
+
+    public updateContent(title: string, description: string, completedDate: Date, visibility: number, skills: Skill[])
+        : void {
+
+        this.timestamp = moment().utc().toDate();
+
+        // TODO: REFACTOR: Check if the value changed first so that we can prevent unnecessary change events
+        this.title = title || this.title;
+        this.description = description || this.description;
+        this.completedDate = completedDate || this.completedDate;
+        this.visibility = visibility || this.visibility;
+
+        // TODO: REFACTOR: Check if the value changed first so that we can prevent unnecessary change events
+        this.skills = skills || this.skills;
+
+
+        this.apply(
+            new AchievementContentUpdatedEvent(
+                this.key, title, description, completedDate, visibility, this.userProfile.userName,
+                skills.map((val) => { return val.key }))
+        );
+
+
+        this.apply(
+            new AchievementSkillsUpdatedEvent(
+                this.key, this.userProfile.userName,
+                skills.map((val) => { return val.key }))
+        );
+
+    }
+
+    public addLike(userProfile: UserProfile, likeCount?: number)
+        : LikeAction {
+
+        const likeAction = new LikeAction(this.key, userProfile, likeCount);
+        this.likes.push(likeAction);
+
+        return likeAction;
+    }
+
 }
 
 export const AchievementSchema = SchemaFactory

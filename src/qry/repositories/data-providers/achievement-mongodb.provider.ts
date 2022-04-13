@@ -22,11 +22,24 @@ export class AchievementMongoDbProvider {
         this.logPolicy.trace('Call AchievementMongoDbProvider.getAll', 'Call');
 
         const projectedProps = DataModel.AchievementSummaryDto.getProjectedProps().join(' ');
+        
         this.logPolicy.debug('PROJECTED PROPS');
         this.logPolicy.debug(projectedProps);
 
         const response = await this.achievementFullModel.find(null, projectedProps).exec();
 
         return response;
+    }
+
+    async saveAchievementDto(dto: DataModel.AchievementFullDto): Promise<DataModel.AchievementFullDto> {
+        this.logPolicy.trace('Call AchievementMongoDBProvider.saveAchievementDto', 'Call');
+
+        const document = await this.achievementFullModel.findOneAndUpdate(
+            { key: dto.key },
+            dto,
+            { returnOriginal: false, upsert: true, useFindAndModify: false }
+        );
+
+        return document;
     }
 }

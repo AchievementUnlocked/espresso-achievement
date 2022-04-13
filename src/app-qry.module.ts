@@ -1,13 +1,16 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule,ConfigService } from '@nestjs/config';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
-import { AchievementQryController } from 'qry/controllers';
 import { HandlersModule as QryHandlersModule } from 'qry/handlers';
 
 import { OperationalLoggingModule } from 'operational/logging';
 import { OperationalErrorModule } from 'operational/exception';
 import { OperationalConfigModule } from 'operational/configuration';
+
+import { AchievementQryController } from 'qry/api';
+import { AchievementAclController } from 'qry/acl';
 
 @Module({
   imports: [
@@ -19,10 +22,32 @@ import { OperationalConfigModule } from 'operational/configuration';
     OperationalConfigModule,
     OperationalLoggingModule,
     OperationalErrorModule,
-    QryHandlersModule
+    QryHandlersModule,
+    ClientsModule.registerAsync([
+      {
+        imports: [ConfigModule],
+        name: 'kafka-client',
+        useFactory: async (configService: ConfigService) => ({
+
+          transport: Transport.KAFKA,
+          options: {
+            client: {
+              clientId: configService.get<string>('KAFKA_CLIENT_ID'),
+              brokers: [configService.get<string>('KAFKA_BROKER_URL')],
+            },
+            consumer: {
+              groupId: configService.get<string>('KAFKA_GROUP_ID'),
+            },
+          },
+
+        }),
+        inject: [ConfigService]
+      }
+    ]),
   ],
   controllers: [
     AchievementQryController,
+    AchievementAclController
   ],
   providers: [
   ]

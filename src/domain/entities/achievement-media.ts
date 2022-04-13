@@ -2,6 +2,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Entity } from '../entities';
 
+import { CodeGeneratorUtil, MimeTypeUtil } from 'domain/utils';
+
 export type AchievementMediaDocument = AchievementMedia & Entity & Document;
 
 @Schema({ collection: 'AchievementMedia' })
@@ -12,7 +14,7 @@ export class AchievementMedia extends Entity {
 
     @Prop()
     timestamp: Date;
-    
+
     @Prop()
     mediaPath: string;
 
@@ -30,8 +32,24 @@ export class AchievementMedia extends Entity {
 
     buffer: Buffer;
 
-    constructor(key: string) {
+    constructor(key: string = null) {
         super(key);
+    }
+
+
+    public static build(originalName: string, mimeType: string, buffer: Buffer) {
+
+        const entity = new AchievementMedia(CodeGeneratorUtil.GenerateShortCode());
+
+        entity.originalName = originalName;
+        entity.mimeType = mimeType;
+        entity.buffer = buffer;
+        entity.size = buffer.length;
+
+        const extension = MimeTypeUtil.getExtension(mimeType);
+        entity.mediaPath = `${entity.key}.${extension}`;
+
+        return entity;
     }
 
     clearBuffer(): void {

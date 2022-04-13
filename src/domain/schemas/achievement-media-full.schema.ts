@@ -20,11 +20,7 @@ export class AchievementMediaFullDto {
     @Prop()
     size: number;
 
-    @Prop()
-    encoding: string;
-
-    buffer: Buffer;
-
+    buffer?: Buffer;
 
     static fromDomain(entity: AchievementMedia): AchievementMediaFullDto {
 
@@ -34,7 +30,6 @@ export class AchievementMediaFullDto {
         dto.originalName = entity.originalName;
         dto.mimeType = entity.mimeType;
         dto.size = entity.size;
-        dto.encoding = entity.encoding;
         dto.buffer = entity.buffer;
 
         return dto;
@@ -42,5 +37,5 @@ export class AchievementMediaFullDto {
 
 }
 
-export const AchevementMediaSchema = SchemaFactory
+export const AchievementMediaSchema = SchemaFactory
     .createForClass(AchievementMediaFullDto);

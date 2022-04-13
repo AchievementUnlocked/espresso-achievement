@@ -1,4 +1,5 @@
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import moment from 'moment';
+import { CommandHandler, EventBus, ICommandHandler, IEvent } from '@nestjs/cqrs';
 import { NotImplementedException } from '@nestjs/common';
 
 import { LogPolicyService } from 'operational/logging';
@@ -40,19 +41,18 @@ export class UpdateAchievementContentCommandHandler
       this.logPolicy.trace('Call UpdateAchievementContentCommandHandler:execute', 'Call');
 
       if (command) {
-        const entity = await this.achievementRepository.getAchievementEntity(command.key);
+
+        const entity: Achievement = await this.achievementRepository.getAchievementEntity(command.key) as Achievement;
 
         if (entity) {
           const mergedEntity = await this.mergeToEntity(command, entity);
 
-          await this.achievementRepository.saveAchievementEntity(mergedEntity);
+          const savedEntity = await this.achievementRepository.saveAchievementEntity(mergedEntity);
 
-          await this.achievementRepository.saveAchievementDto(mergedEntity);
+          const events = entity.getUncommittedEvents() as IEvent[];
+          events.forEach(evt => this.eventBus.publish(evt));
 
-          // TODO: Event Handler: Raise handle complete event
-
-          // if the operation was successful, then we set the saved entity in the response
-          response = new HandlerResponse(mergedEntity);
+          response = new HandlerResponse(savedEntity);
 
         }
         else {
@@ -83,16 +83,10 @@ export class UpdateAchievementContentCommandHandler
     this.logPolicy.trace('Call UpdateAchievementContentCommandHandler.mergeToEntity', 'Call');
 
     if (command && entity) {
-      entity.title = command.title || entity.title;
-      entity.description = command.description || entity.description;
-      entity.completedDate = command.completedDate || entity.completedDate;
-      entity.visibility = command.visibility || entity.visibility;
 
-      if (command.skills && command.skills.length > 0) {
-        const skills = await this.skillRepository.getSkills();
+      const achievementSkills = await this.skillRepository.getSkills(command.skills);
 
-        entity.skills = skills.filter(item => command.skills.indexOf(item.key) !== -1);
-      }
+      entity.updateContent(command.title, command.description, command.completedDate, command.visibility, achievementSkills);
     }
 
     return entity;

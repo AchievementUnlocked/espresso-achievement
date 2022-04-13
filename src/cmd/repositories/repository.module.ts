@@ -6,7 +6,7 @@ import { OperationalConfigModule, ConfigPolicyService } from 'operational/config
 import { OperationalLoggingModule, LogPolicyService } from 'operational/logging';
 import { OperationalErrorModule, ErrorPolicyService } from 'operational/exception';
 
-import { Entity, Achievement, AchievementSchema, Skill, SkillSchema, AchievementMedia, AchievementMediaSchema, UserProfile, UserProfileSchema } from 'domain/entities';
+import { Entity, Achievement, AchievementSchema, Skill, SkillSchema, AchievementMedia, AchievementMediaSchema, UserProfile, UserProfileSchema, LikeAction, LikeActionSchema } from 'domain/entities';
 
 import { AchievementFullDto, AchievementFullSchema, SkillFullDto, SkillFullSchema, UserProfileFullDto, UserProfileFullSchema } from 'domain/schemas';
 import { AchievementMongoDBProvider, UserProfileMongoDBProvider, AchievementAzblobProvider, SkillCacheProvider, SkillMongoDbProvider, MongodbConfigService } from 'cmd/repositories/data-providers';
@@ -24,9 +24,8 @@ import { AchievementRepository, UserProfileRepository, SkillRepository } from 'c
         MongooseModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: async (configService: ConfigService) => ({
-                uri: configService.get<string>('MONGO_CONNECTION_STRING'),
-                useCreateIndex: true,
-                dbName: configService.get<string>('MONGO_DBNAME'),
+                uri: configService.get<string>('MONGO_CMD_CONNECTION_STRING'),
+                dbName: configService.get<string>('MONGO_CMD_DBNAME'),
             }),
             inject: [ConfigService]
         }),
@@ -35,11 +34,11 @@ import { AchievementRepository, UserProfileRepository, SkillRepository } from 'c
         MongooseModule.forFeature([{ name: UserProfile.name, schema: UserProfileSchema }]),
         MongooseModule.forFeature([{ name: AchievementMedia.name, schema: AchievementMediaSchema }]),        
         MongooseModule.forFeature([{ name: Achievement.name, schema: AchievementSchema }]),
-        
-
-        MongooseModule.forFeature([{ name: AchievementFullDto.name, schema: AchievementFullSchema }]),
-        MongooseModule.forFeature([{ name: UserProfileFullDto.name, schema: UserProfileFullSchema }]),
-        MongooseModule.forFeature([{ name: SkillFullDto.name, schema: SkillFullSchema }]),
+        MongooseModule.forFeature([{ name: LikeAction.name, schema: LikeActionSchema }]),
+    
+        // MongooseModule.forFeature([{ name: AchievementFullDto.name, schema: AchievementFullSchema }]),
+        // MongooseModule.forFeature([{ name: UserProfileFullDto.name, schema: UserProfileFullSchema }]),
+        // MongooseModule.forFeature([{ name: SkillFullDto.name, schema: SkillFullSchema }]),
     ],
     providers: [
         ConfigService,

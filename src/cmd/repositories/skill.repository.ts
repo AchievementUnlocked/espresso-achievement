@@ -22,11 +22,15 @@ export class SkillRepository extends CommonRepository {
         this.logPolicy.trace('Init SkillRepository', 'Init');
     }
 
-    async getSkills(): Promise<Skill[]> {
+    async getSkills(keys: string[] = null): Promise<Skill[]> {
 
         const dtoList = await this.cacheProvider.getSkills(async () => this.mongoDbProvider.getSkills());
 
-        return dtoList;
+        const filteredList = keys && keys.length > 0
+            ? dtoList.filter(item => keys.indexOf(item.key) !== -1)
+            : dtoList;
+
+        return filteredList;
     }
 
 }

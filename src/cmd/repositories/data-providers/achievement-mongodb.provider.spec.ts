@@ -79,7 +79,7 @@ describe('Achievement Mongo DB Provider', () => {
     it('Should save an achievment when the entity is provided', async () => {
 
       const user: UserProfile = {
-        key: '123USR',
+        key: '123ABC',
         userName: 'testUser', firstName: 'Test', lastName: 'User',
         email: 'test@email.com',
         timestamp: new Date()
@@ -88,7 +88,7 @@ describe('Achievement Mongo DB Provider', () => {
       const media: AchievementMedia = {
         key: '123MDA',
         timestamp: new Date(),
-        mediaPath: '123USR/123MDA.jpg',
+        mediaPath: '123ABC/123MDA.jpg',
         originalName: 'media.jpg',
         mimeType: 'image/jpeg',
         size: 256,
@@ -110,7 +110,9 @@ describe('Achievement Mongo DB Provider', () => {
         skills: skills,
         visibility: AchievementVisibility.Fiends,
         media: [media],
-        userProfile: user
+        userProfile: user,
+        createdBy: '',
+        updatedBy: ''
       };
 
       achievementEntityModel.findOneAndUpdate = jest.fn().mockResolvedValueOnce(entity);
@@ -131,7 +133,7 @@ describe('Achievement Mongo DB Provider', () => {
     it('Should save an achievment when the dto is provided', async () => {
 
       const user: UserProfile = {
-        key: '123USR',
+        key: '123ABC',
         userName: 'testUser', firstName: 'Test', lastName: 'User',
         email: 'test@email.com',
         timestamp: new Date()
@@ -140,7 +142,7 @@ describe('Achievement Mongo DB Provider', () => {
       const media: AchievementMedia = {
         key: '123MDA',
         timestamp: new Date(),
-        mediaPath: '123USR/123MDA.jpg',
+        mediaPath: '123ABC/123MDA.jpg',
         originalName: 'media.jpg',
         mimeType: 'image/jpeg',
         size: 256,
@@ -162,7 +164,9 @@ describe('Achievement Mongo DB Provider', () => {
         skills: skills,
         visibility: AchievementVisibility.Fiends,
         media: [media],
-        userProfile: user
+        userProfile: user,
+        createdBy: '',
+        updatedBy: ''
       };
 
       const dto = AchievementFullDto.fromDomain(entity);

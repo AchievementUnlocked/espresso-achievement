@@ -7,7 +7,8 @@ import { OperationalErrorModule, ErrorPolicyService } from 'operational/exceptio
 
 import { AchievementRepository, RepositoryModule } from 'qry/repositories';
 
-import { QueryHandlers } from 'qry/handlers/query-handlers';
+import { QueryHandlers } from './query-handlers';
+import { EventHandlers } from './event-handlers';
 
 @Module({
     imports: [
@@ -23,7 +24,8 @@ import { QueryHandlers } from 'qry/handlers/query-handlers';
         LogPolicyService,
         ErrorPolicyService,
         AchievementRepository,
-        ...QueryHandlers
+        ...QueryHandlers,
+        ...EventHandlers
     ],
     exports: [
     ]

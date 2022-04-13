@@ -16,8 +16,6 @@ enum AchievementVisibilityEnum {
 
 export class UpdateAchievementContentCommand extends CommonCommand implements ICommand {
 
-    @IsString({ message: PropertyErrors.IsNotString })
-    @IsNotEmpty({ message: PropertyErrors.IsEmpty })
     key: string;
 
     title?: string;
@@ -25,7 +23,10 @@ export class UpdateAchievementContentCommand extends CommonCommand implements IC
     completedDate?: Date;
     skills?: string[];
     visibility?: number;
-    userName?: string;
+
+    @IsString({ message: PropertyErrors.IsNotString })
+    @IsNotEmpty({ message: PropertyErrors.IsEmpty })
+    userName: string;
 
     constructor() {
         super();

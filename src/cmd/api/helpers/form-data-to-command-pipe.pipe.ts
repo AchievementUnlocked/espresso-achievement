@@ -3,7 +3,7 @@ import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';
 @Injectable()
 export class FormDataToCommandPipe implements PipeTransform<any> {
 
-  constructor(options?: any){
+  constructor(options?: any) {
 
   }
 
@@ -13,7 +13,10 @@ export class FormDataToCommandPipe implements PipeTransform<any> {
     this.logPolicy.debug(value);
     */
 
-    // Parse the string in 'command' to a JSON object
-    return JSON.parse(value.command);
+    // Parse the string in 'command' to a JSON object only if the command has a value
+    return value.command
+      ? JSON.parse(value.command)
+      : value;
+
   }
 }

@@ -1,0 +1,1 @@
+export { AchievementAclController } from './achievement-acl.controller';
