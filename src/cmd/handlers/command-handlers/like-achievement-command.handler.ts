@@ -52,13 +52,13 @@ export class LikeAchievementCommandHandler
           if (userProfile) {
             const likeAction = entity.addLike(userProfile, command.likeCount);
 
-            await this.achievementRepository.saveAchievementEntity(entity);
             await this.achievementRepository.saveAchievementLike(likeAction);
 
             const events = entity.getUncommittedEvents() as IEvent[];
             events.forEach(evt => this.eventBus.publish(evt));
 
             response = new HandlerResponse(entity);
+            
           }
           else {
             throw new EntityNotFoundException(`The user profile with key '${command.commandingUser}' was not found.`);

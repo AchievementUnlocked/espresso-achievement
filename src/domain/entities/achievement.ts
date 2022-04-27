@@ -5,7 +5,8 @@ import { Document } from 'mongoose';
 import { Entity, Aggregate, Skill, AchievementVisibility, AchievementMedia, UserProfile, LikeAction } from 'domain/entities';
 
 import { CodeGeneratorUtil, MimeTypeUtil } from 'domain/utils';
-import { AchievementCreatedEvent, AchievementContentUpdatedEvent, AchievementSkillsUpdatedEvent } from 'domain/events';
+import { AchievementCreatedEvent, AchievementContentUpdatedEvent, AchievementSkillsUpdatedEvent, AchievementLikeAddedEvent } from 'domain/events';
+
 
 export type AchievementDocument = Achievement & Entity & Document;
 
@@ -145,14 +146,33 @@ export class Achievement extends AggregateRoot {
 
     }
 
-    public addLike(userProfile: UserProfile, likeCount?: number)
+    public addLike(userProfile: UserProfile, likeCount: number)
         : LikeAction {
 
-        const likeAction = new LikeAction(this.key, userProfile, likeCount);
-        this.likes.push(likeAction);
+        /*
+         [Domain Rule]
+         Before adding the like action to the achievement, we need to make sure that 
+         the user is not taking the action more than once
+        */
 
-        return likeAction;
+        if(this.likes.findIndex(e => e.userProfile.userName == userProfile.userName) == -1){
+
+            const likeAction = new LikeAction(this.key, userProfile, likeCount);
+
+            this.likes.push(likeAction);
+            
+            this.apply(
+                new AchievementLikeAddedEvent(this.key, this.userProfile.userName,likeCount)
+            );
+
+            return likeAction;
+
+        }
+        else {
+            throw new Error(`A like action for user ${userProfile.key} already exists`);
+        }
     }
+
 
 }
 
