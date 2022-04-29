@@ -47,22 +47,18 @@ export class LikeAchievementCommandHandler
 
         if (entity) {
 
-          const userProfile = await this.userProfileRepository.getUserProfile(command.commandingUser);
+            const likeAction = entity.addLike(command.commandingUser, command.likeCount);
 
-          if (userProfile) {
-            const likeAction = entity.addLike(userProfile, command.likeCount);
-
+            // At this point we need to save the like action but not the achievement entity again.
+            // The reason is that this operation can be called by many processes/threads that want to add a like to single achievement
+            // Causing a potential overwrite between the requests.  Instead, we are going to send the event to a queue/topic and
+            // add the new like synchrounosly by one of many services instances observing the achievements.
             await this.achievementRepository.saveAchievementLike(likeAction);
 
             const events = entity.getUncommittedEvents() as IEvent[];
             events.forEach(evt => this.eventBus.publish(evt));
 
             response = new HandlerResponse(entity);
-            
-          }
-          else {
-            throw new EntityNotFoundException(`The user profile with key '${command.commandingUser}' was not found.`);
-          }
         }
         else {
           throw new EntityNotFoundException(`The achievement entity with key '${command.key}' was not found.`);

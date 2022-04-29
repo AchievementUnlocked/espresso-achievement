@@ -2,9 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 import { Achievement } from 'domain/entities';
-import { AchievementMediaFullDto } from './achievement-media-full.schema';
-import { SkillFullDto } from './skill-full.schema';
-import { UserProfileFullDto } from './userprofile-full.schema';
+import { AchievementMediaFullDto, SkillFullDto, UserProfileFullDto, LikeActionFullDto } from 'domain/schemas';
 
 export type AchievementFullDocument = AchievementFullDto & Document;
 
@@ -34,6 +32,9 @@ export class AchievementFullDto {
 
     @Prop()
     userProfile: UserProfileFullDto;
+
+    @Prop([LikeActionFullDto])
+    likes: LikeActionFullDto[];
 
 
     static fromDomain(entity: Achievement): AchievementFullDto {

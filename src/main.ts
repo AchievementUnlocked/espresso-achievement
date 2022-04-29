@@ -53,6 +53,17 @@ async function bootstrapCmd() {
 
   const configService = appCmd.get(ConfigService);
 
+  /*
+  appCmd.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        brokers: [configService.get<string>('KAFKA_BROKER_URL')],
+      },
+    },
+  });
+  */
+
   appCmd.enableCors({ origin: [configService.get<string>('API_CORS_ALLOWED_ORIGINS')] });
   appCmd.setGlobalPrefix(configService.get<string>('API_PREFIX'));
   appCmd.useGlobalFilters(new GlobalExceptionFilter());
@@ -67,10 +78,13 @@ async function bootstrapCmd() {
   const document = SwaggerModule.createDocument(appCmd, config);
   SwaggerModule.setup('api/achievement/cmd', appCmd, document);
 
+  // await appCmd.startAllMicroservices();
+
   await appCmd.listen(configService.get<number>('API_CMD_PORT'));
 
   console.log(chalk.hex('#2ECC71')(`Espresso Achievement CMD.  Env: ${process.env.NODE_ENV} Port:${configService.get<number>('API_CMD_PORT')}`));
 }
+
 
 bootstrapQry();
 bootstrapCmd();

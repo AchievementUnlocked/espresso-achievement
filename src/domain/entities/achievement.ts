@@ -6,6 +6,7 @@ import { Entity, Aggregate, Skill, AchievementVisibility, AchievementMedia, User
 
 import { CodeGeneratorUtil, MimeTypeUtil } from 'domain/utils';
 import { AchievementCreatedEvent, AchievementContentUpdatedEvent, AchievementSkillsUpdatedEvent, AchievementLikeAddedEvent } from 'domain/events';
+import { AppException, AppExceptionReason } from 'operational/exception';
 
 
 export type AchievementDocument = Achievement & Entity & Document;
@@ -146,7 +147,7 @@ export class Achievement extends AggregateRoot {
 
     }
 
-    public addLike(userProfile: UserProfile, likeCount: number)
+    public addLike(userName: string, likeCount: number)
         : LikeAction {
 
         /*
@@ -155,22 +156,23 @@ export class Achievement extends AggregateRoot {
          the user is not taking the action more than once
         */
 
-        if(this.likes.findIndex(e => e.userProfile.userName == userProfile.userName) == -1){
+        // TODO: [REWORK] Check that the username didn't already provide a like action
+        //if (this.likes.findIndex(e => e.userName == userName) == -1) {
 
-            const likeAction = new LikeAction(this.key, userProfile, likeCount);
+        const likeAction = new LikeAction(this.key, userName, likeCount);
 
-            this.likes.push(likeAction);
-            
-            this.apply(
-                new AchievementLikeAddedEvent(this.key, this.userProfile.userName,likeCount)
-            );
+        this.likes.push(likeAction);
 
-            return likeAction;
+        this.apply(
+            new AchievementLikeAddedEvent(this.key, userName, likeCount)
+        );
 
-        }
-        else {
-            throw new Error(`A like action for user ${userProfile.key} already exists`);
-        }
+        return likeAction;
+
+        // }
+        //else {
+        //    throw new AppException(`A like action for user ${userName} already exists`, AppExceptionReason.Validation);
+        //}
     }
 
 

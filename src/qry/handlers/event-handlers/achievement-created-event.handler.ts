@@ -51,7 +51,8 @@ export class AchievementCreatedEventHandler implements IEventHandler<Achievement
             visibility: event.visibility,
             skills: achivementSkills,
             media: achievementMedia,
-            userProfile: achievementUserProfile
+            userProfile: achievementUserProfile,
+            likes: []
         };
 
         return dto;

@@ -32,4 +32,4 @@ export class UserProfile extends Entity {
 
 export const UserProfileSchema = SchemaFactory
     .createForClass(UserProfile)
-    .index({ key: 1 }, { unique: true });
+    .index({ userName: 1 }, { unique: true });

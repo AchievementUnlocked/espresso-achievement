@@ -26,17 +26,17 @@ import { AchievementAclController } from 'qry/acl';
     ClientsModule.registerAsync([
       {
         imports: [ConfigModule],
-        name: 'kafka-client',
+        name: 'kafka-qry-client',
         useFactory: async (configService: ConfigService) => ({
 
           transport: Transport.KAFKA,
           options: {
             client: {
-              clientId: configService.get<string>('KAFKA_CLIENT_ID'),
+              clientId: configService.get<string>('KAFKA_QRY_CLIENT_ID'),
               brokers: [configService.get<string>('KAFKA_BROKER_URL')],
             },
             consumer: {
-              groupId: configService.get<string>('KAFKA_GROUP_ID'),
+              groupId: configService.get<string>('KAFKA_QRY_GROUP_ID'),
             },
           },
 

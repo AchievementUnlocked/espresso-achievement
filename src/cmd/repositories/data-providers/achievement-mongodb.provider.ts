@@ -31,6 +31,17 @@ export class AchievementMongoDBProvider {
         return document;
     }
 
+    async getAchivementLikes(key: string): Promise<LikeAction[]> {
+        this.logPolicy.trace('Call AchievementMongoDBProvider.getAchivementLikes', 'Call');
+
+        const document = await this.likeEntityModel
+            .find({ achievementKey: key })
+            .lean<LikeAction[]>()
+            .exec();
+
+        return document;
+    }
+
 
     async saveAchievementEntity(entity: Achievement): Promise<Achievement> {
         this.logPolicy.trace('Call AchievementMongoDBProvider.saveAchievementEntity', 'Call');

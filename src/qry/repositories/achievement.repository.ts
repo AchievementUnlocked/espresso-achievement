@@ -32,6 +32,14 @@ export class AchievementRepository {
         return response;
     }
 
+    async getAchievementDto(key: string): Promise<DataModel.AchievementFullDto> {
+        this.logPolicy.trace('Call AchievementRepository.getAchievementDto', 'Call');
+
+        const dto = await this.mongodbProvider.getAchievementDto(key);
+
+        return dto;
+    }
+
     async saveAchievementDto(dto: DataModel.AchievementFullDto): Promise<DataModel.AchievementFullDto> {
         this.logPolicy.trace('Call AchievementRepository.saveAchievementDto', 'Call');
 
@@ -50,5 +58,7 @@ export class AchievementRepository {
             throw new InvalidEntityException("The provided achievment is null or undefined");
         }
     }
+
+    
 
 }

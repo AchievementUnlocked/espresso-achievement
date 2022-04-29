@@ -115,19 +115,22 @@ export class AchievementCmdController extends CommonController {
             command.key = key;
 
             // TODO: Need to get eh requesting user from the headers, or from the receiving command
-            command.commandingUser = '123ABC'
+            // command.commandingUser = '123ABC'
 
             const response = await this.commandBus.execute(command) as HandlerResponse;
 
+            // TODO: DEBUGGING: Printing the response
+            /*
             this.logPolicy.debug('RESPONSE');
             const entity = response.data as Achievement;
-            this.logPolicy.debug(`${entity.key} : ${entity.title}`);
+            this.logPolicy.debug(`${entity?.key} : ${entity?.title}`);
+            */
 
             return response;
         } catch (error) {
             // TODO: Log command before handling the error and returning a response
 
-            this.handleError(error, ControlerErrors.CreateAchievementError);
+            this.handleError(error, ControlerErrors.AchievementLikeAddedError);
         }
 
     }

@@ -1,4 +1,5 @@
-import { HttpModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { HttpModule } from '@nestjs/axios';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
@@ -23,17 +24,17 @@ import { ClientKafka, ClientsModule, Transport } from '@nestjs/microservices';
     ClientsModule.registerAsync([
       {
         imports: [ConfigModule],
-        name: 'kafka-client',
+        name: 'kafka-cmd-client',
         useFactory: async (configService: ConfigService) => ({
 
           transport: Transport.KAFKA,
           options: {
             client: {
-              clientId: configService.get<string>('KAFKA_CLIENT_ID'),
+              clientId: configService.get<string>('KAFKA_CMD_CLIENT_ID'),
               brokers: [configService.get<string>('KAFKA_BROKER_URL')],
             },
             consumer: {
-              groupId: configService.get<string>('KAFKA_GROUP_ID'),
+              groupId: configService.get<string>('KAFKA_CMD_GROUP_ID'),
             },
           },
 

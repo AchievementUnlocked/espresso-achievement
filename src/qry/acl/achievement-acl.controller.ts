@@ -5,7 +5,7 @@ import { Ctx, KafkaContext, MessagePattern, Payload } from '@nestjs/microservice
 import { ConfigPolicyService } from 'operational/configuration';
 import { LogPolicyService } from 'operational/logging';
 
-import { AchievementCreatedEvent } from 'domain/events';
+import { AchievementCreatedEvent, AchievementLikeAddedEvent } from 'domain/events';
 import { KafkaToEventPipe } from './helpers/kafka-to-event.pipe';
 import { CommonController, ControlerErrors } from 'qry/api';
 
@@ -39,6 +39,25 @@ export class AchievementAclController extends CommonController {
             // TODO: Log command before handling the error and returning a response
 
             this.handleError(error, ControlerErrors.HandleCreateAchievementError);
+        }
+    }
+
+
+    @UsePipes(new KafkaToEventPipe<any, AchievementLikeAddedEvent>(), new ValidationPipe({ transform: true }))
+    @MessagePattern('achievement-like-added')
+    async handleAchievementLikeAdded(
+        @Payload() event: AchievementLikeAddedEvent, 
+        @Ctx() context: KafkaContext) {
+
+        this.logPolicy.trace('Call AchievementAclController.handleAchievementLikeAdded', 'Call');
+        try {
+            
+            this.eventBus.publish(event);
+
+        } catch (error) {
+            // TODO: Log command before handling the error and returning a response
+
+            this.handleError(error, ControlerErrors.HandleAchievementLikeAddedError);
         }
     }
 

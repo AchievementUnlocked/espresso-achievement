@@ -15,16 +15,13 @@ export class LikeAction extends Entity {
     likeCount: number;
 
     @Prop()
-    userProfile: UserProfile;
+    userName: string;
 
-    //@Prop()
-    //timestamp: Date
-
-    constructor(achievementKey?: string, userProfile?: UserProfile, likeCount?: number) {
+    constructor(achievementKey?: string, userName?: string, likeCount?: number) {
         super(null);
 
         this.achievementKey = achievementKey;
-        this.userProfile = userProfile;
+        this.userName = userName;
         this.likeCount = likeCount;
         this.timestamp = moment().utc().toDate();
     }

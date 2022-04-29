@@ -25,10 +25,16 @@ export class AchievementRepository extends CommonRepository {
     async getAchievementEntity(key: string): Promise<Achievement> {
         this.logPolicy.trace('Call AchievementRepository.getAchievementEntity', 'Call');
 
-        const document = await this.mongodbProvider.getAchievementEntity(key);
+        const achievementDocument = await this.mongodbProvider.getAchievementEntity(key);
+        const likesDocuments = await this.mongodbProvider.getAchivementLikes(key);
 
         const entity = new Achievement();
-        Object.assign(entity, document);
+        Object.assign(entity, achievementDocument);
+
+        const likes = new Array<LikeAction>();
+        Object.assign(likes, likesDocuments);
+
+        entity.likes = likes;
 
         return entity;
     }
