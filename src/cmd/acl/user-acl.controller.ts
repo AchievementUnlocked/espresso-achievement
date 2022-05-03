@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Post, Put, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, UsePipes, ValidationPipe } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
 import { ConfigPolicyService } from 'operational/configuration';

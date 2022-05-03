@@ -8,6 +8,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     console.log(chalk.redBright('GLOBAL EXCEPTION FILTER'));
 
-    console.log(chalk.redBright(JSON.stringify(exception, null, 2)));
+    console.log(chalk.redBright(exception.name));
+    console.log(chalk.redBright(exception.stack || 'No stack trace'));
   }
 }

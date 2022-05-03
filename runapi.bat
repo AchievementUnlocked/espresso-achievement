@@ -1,3 +1,3 @@
 set NODE_ENV=loc
-npm run start
+nest start --watch
 @REM nest start --watch

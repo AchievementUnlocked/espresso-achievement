@@ -4,4 +4,5 @@ export { AchievementVisibility } from './enums';
 export { Skill, SkillDocument, SkillSchema } from './skill';
 export { AchievementMedia, AchievementMediaDocument, AchievementMediaSchema } from './achievement-media';
 export { UserProfile, UserProfileDocument, UserProfileSchema } from './user-profile';
+export { LikeAction, LikeActionDocument, LikeActionSchema } from './like-action';
 export { Achievement, AchievementDocument, AchievementSchema } from './achievement';

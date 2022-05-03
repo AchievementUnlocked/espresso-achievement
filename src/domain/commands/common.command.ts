@@ -5,6 +5,8 @@ export class CommonCommand {
 
     readonly timestamp?: Date;
 
+    commandingUser: string;
+
     constructor() {
         this.timestamp = moment().utc().toDate();
     }

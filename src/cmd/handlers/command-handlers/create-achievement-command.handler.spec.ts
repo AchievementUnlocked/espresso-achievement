@@ -50,7 +50,7 @@ describe('Create Achievement Command Handler', () => {
 
         if (usr === 'testUser') {
           const userProfile: UserProfile = {
-            key: '123USR',
+            key: '123ABC',
             userName: 'testUser', firstName: 'Test', lastName: 'User',
             email: 'test@email.com',
             timestamp: new Date()

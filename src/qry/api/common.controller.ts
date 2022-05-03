@@ -1,6 +1,6 @@
 import { AppExceptionReason, AppException } from 'operational/exception';
 
-import { ControlerErrors } from 'qry/controllers';
+import { ControlerErrors } from 'qry/api';
 
 export class CommonController {
 

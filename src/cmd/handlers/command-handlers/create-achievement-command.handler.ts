@@ -1,4 +1,4 @@
-import { CommandHandler, EventBus, ICommandHandler } from '@nestjs/cqrs';
+import { CommandHandler, EventBus, ICommandHandler, IEvent } from '@nestjs/cqrs';
 import { NotImplementedException } from '@nestjs/common';
 
 import { LogPolicyService } from 'operational/logging';
@@ -6,7 +6,7 @@ import { EntityNotFoundException, ErrorPolicyService, InvalidCommandException } 
 
 import { Achievement, AchievementMedia, AchievementVisibility, Skill } from 'domain/entities';
 import { CreateAchievementCommand } from 'domain/commands';
-import { CreateAchievementCompletedEvent } from 'domain/events';
+import { AchievementCreatedEvent } from 'domain/events';
 import { CodeGeneratorUtil, MimeTypeUtil } from 'domain/utils';
 
 import { AchievementRepository, UserProfileRepository, SkillRepository } from 'cmd/repositories';
@@ -37,22 +37,19 @@ export class CreateAchievementCommandHandler
 
     let response: HandlerResponse;
 
+
     try {
       this.logPolicy.trace('Call CreateAchievementCommandHandler:execute', 'Call');
 
       if (command) {
-        const entity = await this.mapToEntity(command);
+        const entity: Achievement = await this.mapToEntity(command);
 
-        await this.achievementRepository.saveAchievementEntity(entity);
+        const savedEntity = await this.achievementRepository.saveAchievementEntity(entity);
 
-        await this.achievementRepository.saveAchievementDto(entity);
+        const events = entity.getUncommittedEvents() as IEvent[];
+        events.forEach(evt => this.eventBus.publish(evt));
 
-        // TODO: Event Handler: Raise handle complete event
-        // const completedEvent = new CreateAchievementCompletedEvent(entity);
-        // this.eventBus.publish(completedEvent);
-
-        // if the operation was successful, then we set the saved entity in the response
-        response = new HandlerResponse(entity);
+        response = new HandlerResponse(savedEntity);
       }
       else {
         throw new InvalidCommandException('The provided command is null or invalid');
@@ -71,44 +68,18 @@ export class CreateAchievementCommandHandler
 
     this.logPolicy.trace('Call CreateAchievementCommandHandler.mapToEntity', 'Call');
 
-    const userProfile = await this.userProfileRepository.getUserProfile(command.userName);
+    const achievementUserProfile = await this.userProfileRepository.getUserProfile(command.userName);
 
-    if (userProfile) {
-      const entity = new Achievement(CodeGeneratorUtil.GenerateShortCode());
+    if (achievementUserProfile) {
 
-      entity.userProfile = userProfile;
+      const achivementSkills = await this.skillRepository.getSkills(command.skills);
+      const achievementMedia = await this.achievementRepository.buildAchievementMedia(command.media);
 
-      entity.title = command.title;
-      entity.description = command.description;
-      entity.completedDate = command.completedDate;
-
-      entity.visibility = command.visibility
-        ? command.visibility as number
-        : AchievementVisibility.Private;
-
-      const skills = await this.skillRepository.getSkills();
-
-      entity.skills = command.skills && command.skills.length > 0
-        ? skills.filter(item => command.skills.indexOf(item.key) !== -1)
-        : [];
-
-      entity.media = command.media && command.media.length > 0
-        ? command.media.map((val, idx) => {
-          const mediaEntity = new AchievementMedia(CodeGeneratorUtil.GenerateShortCode());
-
-          // Get the extension from the mmime type of teh file
-          const extension = MimeTypeUtil.getExtension(val.mimeType);
-
-          mediaEntity.mediaPath = `${entity.key}/${mediaEntity.key}_${idx}.${extension}`;
-          mediaEntity.originalName = val.originalName;
-          mediaEntity.mimeType = val.mimeType;
-          mediaEntity.size = val.size;
-          mediaEntity.buffer = val.buffer;
-
-          return mediaEntity;
-        })
-        : [];
-
+      // We want to let the entity generate its own key, so we send null
+      const entity = new Achievement(null,
+        command.title, command.description, command.completedDate, command.visibility,
+        achievementUserProfile, achivementSkills, achievementMedia
+      );
 
       return entity;
     }

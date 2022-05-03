@@ -5,7 +5,7 @@ import { LogPolicyService } from '../../../operational/logging';
 import { InvalidEntityException } from '../../../operational/exception';
 
 import { AchievementAzblobProvider } from '.';
-import { AchevementMediaFullDto } from '../../../domain/schemas';
+import { AchievementMediaFullDto } from '../../../domain/schemas';
 
 
 class AchievementAzblobProviderTest extends AchievementAzblobProvider
@@ -54,9 +54,9 @@ describe('Achievement Az Blob Provider', () => {
 
     it('Should save the dtowhen a valid dto is provided', () => {
 
-      const dto: AchevementMediaFullDto[] = [];
+      const dto: AchievementMediaFullDto[] = [];
 
-      // async saveAchievementMediaDto(dto: AchevementMediaFullDto[]) {
+      // async saveAchievementMediaDto(dto: AchievementMediaFullDto[]) {
       
 
     });

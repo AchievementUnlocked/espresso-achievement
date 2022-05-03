@@ -12,7 +12,7 @@ import { AppExceptionFilter } from 'operational/exception';
 
 // Inner application dependencies
 import { Achievement } from 'domain/entities';
-import { CreateAchievementCommand, CreateAchievementMediaCommand, UpdateAchievementContentCommand } from 'domain/commands';
+import { CreateAchievementCommand, CreateAchievementMediaCommand, LikeAchievementCommand, UpdateAchievementContentCommand } from 'domain/commands';
 import { HandlerResponse } from 'cmd/handlers/command-handlers';
 
 // Innermodule dependencies
@@ -46,14 +46,20 @@ export class AchievementCmdController extends CommonController {
         this.logPolicy.trace('Call AchievementController.createAchievementWithFile', 'Call');
 
         try {
+            // TODO: Need to get eh requesting user from the headers, or from the receiving command
+            command.commandingUser = '123ABC'
+
             // Take each of the file metadat andd turn it into a command
             command.media = CreateAchievementMediaCommand.fromHttpFiles(files);
 
             const response = await this.commandBus.execute(command) as HandlerResponse;
 
+            // TODO: DEBUGGING: Printing the response
+            /*
             this.logPolicy.debug('RESPONSE');
             const entity = response.data as Achievement;
             this.logPolicy.debug(`${entity.key} : ${entity.title}`);
+            */
 
             return response;
         } catch (error) {
@@ -76,11 +82,17 @@ export class AchievementCmdController extends CommonController {
         try {
             command.key = key;
 
+            // TODO: Need to get eh requesting user from the headers, or from the receiving command
+            command.commandingUser = '123ABC'
+
             const response = await this.commandBus.execute(command) as HandlerResponse;
 
+            // TODO: DEBUGGING: Printing the response
+            /*
             this.logPolicy.debug('RESPONSE');
             const entity = response.data as Achievement;
             this.logPolicy.debug(`${entity.key} : ${entity.title}`);
+            */
 
             return response;
         } catch (error) {
@@ -88,6 +100,39 @@ export class AchievementCmdController extends CommonController {
 
             this.handleError(error, ControlerErrors.CreateAchievementError);
         }
+    }
+
+    @Put(':key/like')
+    @HttpCode(202)
+    @UsePipes(new ValidationPipe({ transform: true }))
+    async likeAchievement(
+        @Param('key') key: string,
+        @Body() command: LikeAchievementCommand) {
+
+        this.logPolicy.trace('Call AchievementController.likeAchievement', 'Call');
+
+        try {
+            command.key = key;
+
+            // TODO: Need to get eh requesting user from the headers, or from the receiving command
+            // command.commandingUser = '123ABC'
+
+            const response = await this.commandBus.execute(command) as HandlerResponse;
+
+            // TODO: DEBUGGING: Printing the response
+            /*
+            this.logPolicy.debug('RESPONSE');
+            const entity = response.data as Achievement;
+            this.logPolicy.debug(`${entity?.key} : ${entity?.title}`);
+            */
+
+            return response;
+        } catch (error) {
+            // TODO: Log command before handling the error and returning a response
+
+            this.handleError(error, ControlerErrors.AchievementLikeAddedError);
+        }
+
     }
 
 }

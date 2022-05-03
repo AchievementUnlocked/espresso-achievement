@@ -2,9 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 import { Achievement } from 'domain/entities';
-import { AchievementMediaFullDto } from './achevement-media-full.schema';
-import { SkillFullDto } from './skill-full.schema';
-import { UserProfileFullDto } from './userprofile-full.schema';
+import { AchievementMediaFullDto, SkillFullDto, UserProfileFullDto, LikeActionFullDto } from 'domain/schemas';
 
 export type AchievementFullDocument = AchievementFullDto & Document;
 
@@ -35,6 +33,9 @@ export class AchievementFullDto {
     @Prop()
     userProfile: UserProfileFullDto;
 
+    @Prop([LikeActionFullDto])
+    likes: LikeActionFullDto[];
+
 
     static fromDomain(entity: Achievement): AchievementFullDto {
 
@@ -63,31 +64,6 @@ export class AchievementFullDto {
         return dto;
     }
 
-
-    /*
-    static fromCreateCommand(command: CreateAchievementCommand): AchievementFullDto {
-
-        const dto = new AchievementFullDto();
-
-        dto.key = command.key;
-        dto.title = command.title;
-        dto.description = command.description;
-        dto.completedDate = command.completedDate;
-        dto.visibility = command.visibility;
-
-        dto.skills = command.skills.map((val) => {
-            return SkillFullDto.fromCreateCommand(val);
-        });
-
-        dto.media = command.media.map((val) => {
-            return AchevementMediaFullDto.fromCreateCommand(val);
-        });
-
-        dto.userProfile = UserProfileFullDto.fromCreateCommand(command.userProfile);
-
-        return dto;
-    }
-    */
 }
 
 export const AchievementFullSchema = SchemaFactory
